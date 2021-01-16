@@ -32,7 +32,7 @@ def shopSmart(orderList, fruitShops):
     t_cost = []
     for shop in fruitShops:
         t_cost.append((shop,shop.getPriceOfOrder(orderList)))
-    return min(t_cost, key=lambda k: d[k])
+    return min(t_cost, key=lambda k: t_cost[k])
 
 if __name__ == '__main__':
   "This code runs when you invoke the script from the command line"
