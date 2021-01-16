@@ -34,8 +34,8 @@ def buyLotsOfFruit(orderList):
     """
     totalCost = 0.0
     "*** YOUR CODE HERE ***"
-    for index, val in enumerate(orderList):
-        totalCost = totalCost + val
+    for index, tup in enumerate(orderList):
+        totalCost = totalCost + tup[1]
     return totalCost
 
 # Main Method
