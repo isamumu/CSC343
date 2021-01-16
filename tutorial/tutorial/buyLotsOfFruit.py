@@ -35,7 +35,17 @@ def buyLotsOfFruit(orderList):
     totalCost = 0.0
     "*** YOUR CODE HERE ***"
     for index, tup in enumerate(orderList):
-        totalCost = totalCost + tup[1]
+        if(tup[0] == 'apples'):
+            totalCost = totalCost + fruitPrices[0] * tup[1]
+        elif(tup[0] == 'oranges'):
+            totalCost = totalCost + fruitPrices[1] * tup[1]
+        elif(tup[0] == 'pears'):
+            totalCost = totalCost + fruitPrices[2] * tup[1]
+        elif(tup[0] == 'limes'):
+            totalCost = totalCost + fruitPrices[3] * tup[1]
+        elif(tup[0] == 'strawberries'):
+            totalCost = totalCost + fruitPrices[4] * tup[1]
+
     return totalCost
 
 # Main Method
