@@ -29,10 +29,7 @@ def shopSmart(orderList, fruitShops):
         fruitShops: List of FruitShops
     """
     "*** YOUR CODE HERE ***"
-    t_cost = []
-    for shop in fruitShops:
-        t_cost.append((shop,shop.getPriceOfOrder(orderList)))
-    return min(t_cost, key=lambda k: t_cost[k])
+    return max(fruitshops, key = lambda fs:fs.getPriceOfOrder(orderList)
 
 if __name__ == '__main__':
   "This code runs when you invoke the script from the command line"
