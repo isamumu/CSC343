@@ -29,7 +29,7 @@ def shopSmart(orderList, fruitShops):
         fruitShops: List of FruitShops
     """
     "*** YOUR CODE HERE ***"
-    return max(fruitShops, key = lambda fs:fs.getPriceOfOrder(orderList))
+    return min(fruitShops, key = lambda fs:fs.getPriceOfOrder(orderList))
 
 if __name__ == '__main__':
   "This code runs when you invoke the script from the command line"
