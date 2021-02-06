@@ -1,2 +1,4 @@
 SET search_path TO World;
-SELECT * FROM countrylanguage WHERE countrycode = 'CAN';
+SELECT count(countrycode)
+FROM countrylanguage 
+WHERE countrylanguage = 'English';
