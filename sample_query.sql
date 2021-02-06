@@ -1,4 +1,4 @@
 SET search_path TO World;
-SELECT count(countrycode)
-FROM countrylanguage 
-WHERE countrylanguage = 'English';
+SELECT count(countrylanguage)
+FROM country JOIN countrylanguage on code=countrycode 
+WHERE name = 'Mozambique';
