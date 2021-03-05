@@ -1,0 +1,14 @@
+Create view passed as
+SELECT sID 
+FROM Took 
+WHERE grade > 50 
+GROUP by sID 
+HAVING count(oID) >= 20;
+
+CREATE view passCGPA as
+SELECT sID, cgpa 
+FROM Student 
+WHERE cgpa >= 1.85;
+
+SELECT passed.sID, passCGPA.cgpa
+FROM passed join passCGPA on passed.sID = passCGPA.sID;

@@ -1,0 +1,15 @@
+Create view breadthers as
+SELECT Took.sID, count(Took.oID)
+FROM Course natural join Offering natural join Took
+WHERE grade >= 50 and breadth=True
+GROUP BY Took.sID;
+
+Create view nonbreadthers as
+SELECT Took.sID, count(Took.oID)
+FROM Course natural join Offering natural join Took
+WHERE grade >= 50 and breadth=False
+GROUP BY Took.sID;
+
+SELECT breadthers.sID 
+FROM breadthers, nonbreadthers
+WHERE breadthers.sid = nonbreadthers.sid and breadthers.count >= 2*nonbreadthers.count;
