@@ -38,4 +38,5 @@ FROM passengers JOIN passenger on passengers.pass_id = passenger.id;
 INSERT INTO q1
 (SELECT travellers.pass_id as pass_id, travellers.firstname || ' ' || travellers.lastname as name, count(airPassenger.airline) as airlines
 FROM travellers JOIN airPassenger on travellers.pass_id = airPassenger.pass_id
-GROUP BY travellers.pass_id, travellers.firstname, travellers.lastname);
+GROUP BY travellers.pass_id, travellers.firstname, travellers.lastname)
+ORDER BY travellers.pass_id;

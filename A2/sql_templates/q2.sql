@@ -132,12 +132,13 @@ WHERE depDelay >= '00:12:00';
 CREATE VIEW refunds AS
 (SELECT * FROM thirtyfiveDOM) UNION (SELECT * FROM fiftyDOM) UNION (SELECT * FROM thirtyfiveDOM) UNION (SELECT* FROM fiftyINT);
 
-CREATE VIEW refundLabels AS
+
+
+-- Your query that answers the question goes below the "insert into" line:
+-- TODO: insert the query
+INSERT INTO q2
 SELECT flight.airline, airline.name, EXTRACT(year FROM departure.datetime) as year, refunds.seat_class as seat_class, sum(refunds.refund) as refund
 FROM refunds JOIN flight on refunds.id = flight.id 
              JOIN airline on flight.airline = airline.code
              JOIN departure on refunds.id = departure.flight_id
 GROUP BY flight.airline, airline.name, refunds.seat_class, departure.datetime;
-
--- Your query that answers the question goes below the "insert into" line:
-INSERT INTO q2
