@@ -31,7 +31,7 @@ FROM passengers JOIN flight on passengers.flight_id = flight.id;
 
 -- find a relation relating a passenger to their firstname and lastname, with their passenger id 
 CREATE VIEW travellers AS
-SELECT passengers.pass_id as pass_id, passenger.firstname as firstname, passenger.surname as lastname
+SELECT distinct passengers.pass_id as pass_id, passenger.firstname as firstname, passenger.surname as lastname
 FROM passengers JOIN passenger on passengers.pass_id = passenger.id;
 
 -- Your query that answers the question goes below the "insert into" line:
