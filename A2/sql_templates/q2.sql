@@ -141,4 +141,5 @@ SELECT flight.airline, airline.name, EXTRACT(year FROM departure.datetime) as ye
 FROM refunds JOIN flight on refunds.id = flight.id 
              JOIN airline on flight.airline = airline.code
              JOIN departure on refunds.id = departure.flight_id
-GROUP BY flight.airline, airline.name, refunds.seat_class, departure.datetime;
+GROUP BY flight.airline, airline.name, refunds.seat_class, departure.datetime
+ORDER BY sum(refunds.refund);
