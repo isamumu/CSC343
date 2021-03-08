@@ -88,12 +88,12 @@ FROM internationals JOIN realINT on internationals.flight_id = realINT.id
 CREATE VIEW refundDOM AS
 SELECT id, depDelay
 FROM delayDOM
-WHERE arvDelay > depDelay / 2 and depDelay >= '05:00:00';
+WHERE (arvDelay > (depDelay / 2)) and (depDelay >= '05:00:00');
 
 CREATE VIEW refundINT AS
 SELECT id, depDelay
 FROM delayINT
-WHERE arvDelay > depDelay / 2 and depDelay >= '08:00:00';
+WHERE (arvDelay > (depDelay / 2)) and (depDelay >= '08:00:00');
 
 -- -- find pricing of domestic flights
 -- CREATE VIEW priceDOM AS
@@ -109,7 +109,7 @@ WHERE arvDelay > depDelay / 2 and depDelay >= '08:00:00';
 CREATE VIEW thirtyfiveDOM AS
 SELECT booking.flight_id as id, 0.35 * price as refund, seat_class
 FROM refundDOM join booking on refundDOM.id = booking.flight_id
-WHERE depDelay >= '00:05:00' and depDelay < '00:10:00'; 
+WHERE (depDelay >= '00:05:00') and (depDelay < '00:10:00'); 
 
 -- find domestic flights of 50% refund
 CREATE VIEW fiftyDOM AS
@@ -121,7 +121,7 @@ WHERE depDelay >= '00:10:00';
 CREATE VIEW thirtyfiveINT AS
 SELECT booking.flight_id as id, 0.35 * price as refund, seat_class
 FROM refundINT join booking on refundINT.id = booking.flight_id
-WHERE depDelay >= '00:08:00' and depDelay < '00:12:00'; 
+WHERE (depDelay >= '00:08:00') and (depDelay < '00:12:00'); 
 
 -- find international flights of 50% refund
 CREATE VIEW fiftyINT AS
