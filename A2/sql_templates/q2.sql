@@ -16,7 +16,13 @@ CREATE TABLE q2 (
 -- (But give them better names!) The IF EXISTS avoids generating an error 
 -- the first time this file is imported.
 DROP VIEW IF EXISTS intermediate_step CASCADE;
-
+DROP VIEW IF EXISTS outCountries CASCADE;
+DROP VIEW IF EXISTS inCountries CASCADE;
+DROP VIEW IF EXISTS flightCountry CASCADE;
+DROP VIEW IF EXISTS internationals CASCADE;
+DROP VIEW IF EXISTS domestics CASCADE;
+DROP VIEW IF EXISTS scheduledDOM CASCADE;
+DROP VIEW IF EXISTS scheduledINT CASCADE;
 
 -- Define views for your intermediate steps here:
 

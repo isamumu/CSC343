@@ -21,6 +21,50 @@ DROP VIEW IF EXISTS intermediate_step CASCADE;
 
 -- Define views for your intermediate steps here:
 
+-- find all combinations of flights between CANADA and the US from 
+CREATE VIEW canadaUSA as
+SELECT distinct a1.code as outPort, a2.code as inPort
+FROM Airport a1, Airport a2
+WHERE (a1.country = 'Canada' and a2.country = 'USA') or (a1.country = 'USA' and a2.country = 'Canada');
+
+-- find outbound flights on 2021-04-30 
+CREATE VIEW aprilOutbound as
+SELECT flight.id as id, flight.outbound as outAir, airport.country, s_dep as departure
+FROM flight JOIN airport on flight.outbound = airport.code 
+WHERE date(flight.s_dep) = '2021-04-30';
+
+-- find inbound flights on 2021-04-30 
+CREATE VIEW aprilInbound as
+SELECT flight.id as id, flight.inbound as inAir, airport.country, s_arv as arrival
+FROM flight JOIN airport on flight.inbound = airport.code 
+WHERE date(flight.s_arv) = '2021-04-30';
+
+-- combine inbound and outbound tables
+CREATE VIEW aprilFlights as
+SELECT aprilOutbound.id as id, outair, inair, aprilOutbound.country as outCountry, aprilInbound.country as inCountry, aprilOutbound.departure, aprilInbound.arrival
+FROM aprilOutbound JOIN aprilInbound on aprilOutbound.id = aprilInbound.id;
+
+-- find direct routes
+CREATE VIEW directFlights as 
+SELECT distinct aprilFlights.outair as outPort, aprilFlights.inair as inPort, aprilFlights.departure
+FROM aprilFlights JOIN canadaUSA on aprilFlights.outair = canadaUSA.outPort and aprilFlights.inair = canadaUSA.inPort;
+
+-- find one connection
+CREATE VIEW oneLayover as
+SELECT distinct canadaUSA.outPort, canadaUSA.inPort, f1.departure as departure
+FROM aprilFlights f1 JOIN canadaUSA on f1.outair = canadaUSA.outPort 
+                     JOIN aprilFlights f2 on f1.inair = f2.outair and f2.inair = canadaUSA.inPort
+WHERE f2.departure - f1.arrival >= '00:30:00';
+
+-- find two connections
+CREATE VIEW twoLayover as
+SELECT distinct canadaUSA.outPort, canadaUSA.inPort, f1.departure
+FROM aprilFlights f1 JOIN canadaUSA on f1.outair = canadaUSA.outPort 
+                     JOIN aprilFlights f2 on f1.inair = f2.outair
+                     JOIN aprilFlights f3 on f2.inair = f3.outair and f3.inair = canadaUSA.inPort
+WHERE f2.departure - f1.arrival >= '00:30:00' and f3.departure - f2.arrival >= '00:30:00';
+
+-- TODO: combine the tables
 
 -- Your query that answers the question goes below the "insert into" line:
 INSERT INTO q3
