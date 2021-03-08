@@ -58,14 +58,14 @@ FROM aprilFlights JOIN canadaUSA on aprilFlights.outair = canadaUSA.outPort and 
 
 -- find one connection
 CREATE VIEW oneLayover as
-SELECT distinct canadaUSA.outPort, canadaUSA.inPort, f1.departure as arrival
+SELECT distinct canadaUSA.outPort, canadaUSA.inPort, f2.arrival 
 FROM aprilFlights f1 JOIN canadaUSA on f1.outair = canadaUSA.outPort 
                      JOIN aprilFlights f2 on f1.inair = f2.outair and f2.inair = canadaUSA.inPort
 WHERE f2.departure - f1.arrival >= '00:30:00';
 
 -- find two connections
 CREATE VIEW twoLayover as
-SELECT distinct canadaUSA.outPort, canadaUSA.inPort, f1.arrival
+SELECT distinct canadaUSA.outPort, canadaUSA.inPort, f3.arrival
 FROM aprilFlights f1 JOIN canadaUSA on f1.outair = canadaUSA.outPort 
                      JOIN aprilFlights f2 on f1.inair = f2.outair
                      JOIN aprilFlights f3 on f2.inair = f3.outair and f3.inair = canadaUSA.inPort
