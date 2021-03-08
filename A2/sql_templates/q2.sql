@@ -88,12 +88,12 @@ FROM internationals JOIN realINT on internationals.flight_id = realINT.id
 CREATE VIEW refundDOM AS
 SELECT id, depDelay
 FROM delayDOM
-WHERE arvDelay > depDelay / 2 and depDelay > '05:00:00';
+WHERE arvDelay > depDelay / 2 and depDelay >= '05:00:00';
 
 CREATE VIEW refundINT AS
 SELECT id, depDelay
 FROM delayINT
-WHERE arvDelay > depDelay / 2 and depDelay > '08:00:00';
+WHERE arvDelay > depDelay / 2 and depDelay >= '08:00:00';
 
 -- -- find pricing of domestic flights
 -- CREATE VIEW priceDOM AS
