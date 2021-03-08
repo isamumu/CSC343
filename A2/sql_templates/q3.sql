@@ -17,6 +17,13 @@ CREATE TABLE q3 (
 -- (But give them better names!) The IF EXISTS avoids generating an error 
 -- the first time this file is imported.
 DROP VIEW IF EXISTS intermediate_step CASCADE;
+DROP VIEW IF EXISTS canadaUSA CASCADE;
+DROP VIEW IF EXISTS aprilOutbound CASCADE;
+DROP VIEW IF EXISTS aprilInbound CASCADE;
+DROP VIEW IF EXISTS aprilFlights CASCADE;
+DROP VIEW IF EXISTS directFlights CASCADE;
+DROP VIEW IF EXISTS oneLayover CASCADE;
+DROP VIEW IF EXISTS twoLayover CASCADE;
 
 
 -- Define views for your intermediate steps here:
@@ -46,25 +53,39 @@ FROM aprilOutbound JOIN aprilInbound on aprilOutbound.id = aprilInbound.id;
 
 -- find direct routes
 CREATE VIEW directFlights as 
-SELECT distinct aprilFlights.outair as outPort, aprilFlights.inair as inPort, aprilFlights.departure
+SELECT distinct aprilFlights.outair as outPort, aprilFlights.inair as inPort, aprilFlights.arrival
 FROM aprilFlights JOIN canadaUSA on aprilFlights.outair = canadaUSA.outPort and aprilFlights.inair = canadaUSA.inPort;
 
 -- find one connection
 CREATE VIEW oneLayover as
-SELECT distinct canadaUSA.outPort, canadaUSA.inPort, f1.departure as departure
+SELECT distinct canadaUSA.outPort, canadaUSA.inPort, f1.departure as arrival
 FROM aprilFlights f1 JOIN canadaUSA on f1.outair = canadaUSA.outPort 
                      JOIN aprilFlights f2 on f1.inair = f2.outair and f2.inair = canadaUSA.inPort
 WHERE f2.departure - f1.arrival >= '00:30:00';
 
 -- find two connections
 CREATE VIEW twoLayover as
-SELECT distinct canadaUSA.outPort, canadaUSA.inPort, f1.departure
+SELECT distinct canadaUSA.outPort, canadaUSA.inPort, f1.arrival
 FROM aprilFlights f1 JOIN canadaUSA on f1.outair = canadaUSA.outPort 
                      JOIN aprilFlights f2 on f1.inair = f2.outair
                      JOIN aprilFlights f3 on f2.inair = f3.outair and f3.inair = canadaUSA.inPort
 WHERE f2.departure - f1.arrival >= '00:30:00' and f3.departure - f2.arrival >= '00:30:00';
 
 -- TODO: combine the tables
+CREATE VIEW combined as
+(SELECT outPort, inPort, 1 as direct, 0 as one_con, 0 as two_con, arrival FROM directFlights) UNION
+(SELECT outPort, inPort, 0 as direct, 1 as one_con, 0 as two_con, arrival FROM oneLayover) UNION
+(SELECT outPort, inPort, 0 as direct, 0 as one_con, 1 as two_con, arrival FROM twoLayover);
+
+CREATE VIEW result as
+SELECT a1.city as outPort, a2.city as inPort, direct, one_con, two_con, arrival
+FROM combined JOIN airport a1 on a1.code = combined.outPort
+              JOIN airport a2 on a2.code = combined.inPort;
+
+
 
 -- Your query that answers the question goes below the "insert into" line:
 INSERT INTO q3
+SELECT outport, inPort, sum(direct) as direct, sum(one_con) as one_con, sum(two_con) as two_con, min(arrival)
+FROM result
+GROUP BY outport, inPort;
