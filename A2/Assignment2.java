@@ -89,7 +89,203 @@ public class Assignment2 {
     */
    public boolean bookSeat(int passID, int flightID, String seatClass) {
       // Implement this method!
-      return false;
+      // general skeleton:
+      // statement to get get id, price
+      // book from economy, to business to first class
+      // A B C D E F seats
+      // overbooking economy???? dang have to accept null seats? and then upgrade? but cant use the upgrade function
+	try{
+
+      PreparedStatement booking_statement = connection.prepareStatement(
+         "SELECT flight.id, plane.capacity_economy as econ_capacity, " +
+         "plane.capacity_business as business_capacity, "+ 
+         "plane.capacity_first as firstclass_capacity " +
+         "FROM flight, plane "+"
+         WHERE flight.plane = plane.tail_number and flight.id = ?");
+
+      // set int to get the input
+      booking_statement.setInt(1, flightID);
+         ResultSet flight_capacity = bookingStatement.executeQuery();
+      
+      PreparedStatement flight_price = connection.prepareStatement("SELECT * FROM price WHERE flight_id = ?");
+         flight_price.setInt(1, flightID);
+         ResultSet available_flights = flight_price.executeQuery();
+      
+      PreparedStatement seat_and_class = connection.prepareStatement(
+            "SELECT count(*) FROM booking " +
+            "WHERE booking.flight_id = ? " +
+            "and seat_class = ?::seat_class ");
+      seat_and_class.setInt(1, flightID);
+      seat_and_class.setString(2, seatClass);
+
+      ResultSet already_booked = seat_and_class.executeQuery();
+
+      // ok so now we can enter the search so long as:
+      // there is flight capacity, and its not already booked
+      // and ofc the given flight exists
+      while(already_booked.next() && available_flights.next() && flight_capacity.next()){
+         int price = available_flights.getInt(seatClass);
+         
+         // does order matter? economy, business, first?
+         // dont think so but for sake of logic/ordering will just assume that avg booker
+         // wants cheapest to more expensive?
+
+         if(seatClass == "economy"){
+
+            // have to check/account for  for overbooking (aka the -10)
+            // check placement of the brackets
+            // (flight_capacity.getInt("capacity_economy") - already_booked.getInt("count")) > -10)
+            // equivalent to: 
+            if({
+
+               PreparedStatement econ_booking = connection.prepareStatement(
+                  "INSERT INTO booking " +
+                  "VALUES((SELECT MAX(id) FROM booking)+1, " + 
+                  " ?, ?, ?, ?, ?::seat_class, ?, ?)" );
+               econ_booking.setInt(1, passID);
+               econ_booking.setInt(2, flightID);
+               econ_booking.setTimestamp(3, getCurrentTimeStamp());
+               econ_booking.setInt(4, price);
+               econ_booking.setString(5, seatClass);
+               
+               // case where we do not need overbooking
+               if(flight_capacity.getInt("econ_capacity") - already_booked.getInt("count") > 0){
+
+                  int economy_start = flight_capacity.getInt("capacity_first")/6 + flight_capacity.getInt("capacity_business")/6 + 3;		
+                  int max_row = economy_start + already_booked.getInt("count")/6;
+                  int max_letter_num = already_booked.getInt("count") % 6;
+
+                  char max_letter = 'A';
+                  if(max_letter_num == 0){
+                     max_row = max_row + 1;
+                  }else if (max_letter_num == 1){
+                     max_letter = 'B'; //(char)(max_letter + max_letter_num);
+                  }else if (max_letter_num == 2){
+                     max_letter = 'C'//(char)(max_letter + max_letter_num);
+                  }else if (max_letter_num == 3){
+                     max_letter = 'D'//(char)(max_letter + max_letter_num);
+                  }else if (max_letter_num == 4){
+                     max_letter = 'E'//(char)(max_letter + max_letter_num);
+                  }else if (max_letter_num == 5){
+                     max_letter = 'F'//(char)(max_letter + max_letter_num);
+                  }
+         
+                  econ_booking.setString(7, max_letter+" ");
+                  econ_booking.setInt(6, max_row);
+                  econ_booking.setString(7, String.valueOf(max_letter));
+            
+               }else{
+
+                  econ_booking.setNull(6, Types.NULL);
+                  econ_booking.setNull(7, Types.NULL);
+               }
+               
+               econ_booking.executeUpdate();
+               
+               return true;
+
+            }
+            return false;
+         } 
+         // business class rules
+         
+         if(seatClass == "business"){
+            if(flight_capacity.getInt("business_capacity") - already_booked.getInt("count")> 0){
+
+               PreparedStatement business_booking = connection.prepareStatement(
+                  "INSERT INTO booking " +
+                  "VALUES((SELECT MAX(id) FROM booking)+1, "
+                  "?, ?, ?, ?, ?::seat_class, ?, ?)" );
+
+               business_booking.setInt(1, passID);
+               business_booking.setInt(2, flightID);
+               business_booking.setTimestamp(3, getCurrentTimeStamp());
+               business_booking.setInt(4, price);
+               business_booking.setString(5, seatClass);
+               int business_start = flight_capacity.getInt("capacity_first")/6 + 1 + 1;		
+               int max_row = business_start + already_booked.getInt("count")/6;
+               
+               int max_letter_num = already_booked.getInt("count") % 6;
+
+               // could put in helper function but nahhhh
+               char max_letter = 'A';
+               if(max_letter_num == 0){
+                  max_row = max_row + 1;
+               }else if (max_letter_num == 1){
+                  max_letter = 'B'; //(char)(max_letter + max_letter_num);
+               }else if (max_letter_num == 2){
+                  max_letter = 'C';
+               }else if (max_letter_num == 3){
+                  max_letter = 'D';
+               }else if (max_letter_num == 4){
+                  max_letter = 'E';
+               }else if (max_letter_num == 5){
+                  max_letter = 'F';
+               }
+
+               business_booking.setInt(6, max_row);
+               business_booking.setString(7, max_letter+" ");
+               business_booking.setString(7, String.valueOf(max_letter));
+               business_booking.executeUpdate();
+               return true;
+
+            }
+            return false;
+         } 
+         
+         if(seatClass == "first"){
+
+            if(flight_capacity.getInt("firstclass_capacity") - already_booked.getInt("count")> 0){
+               
+               PreparedStatement first_booking = connection.prepareStatement(
+                  "INSERT INTO booking " +
+                  "VALUES((SELECT MAX(id) FROM booking)+1, "
+                  + "?, ?, ?, ?, ?::seat_class, ?, ?)" );
+               first_booking.setInt(1, passID);
+               first_booking.setInt(2, flightID);
+               first_booking.setTimestamp(3, getCurrentTimeStamp());
+               first_booking.setInt(4, price);
+               first_booking.setString(5, seatClass);
+               int first_start = 1;		
+               int max_row = first_start + already_booked.getInt("count")/6;
+               
+               int max_letter_num = already_booked.getInt("count") % 6;
+
+               char max_letter = 'A';
+               if(max_letter_num == 0){
+                  max_row = max_row + 1;
+                  max_letter = 'A';
+               }else if (max_letter_num == 1){
+                  max_letter = 'B'; 
+               }else if (max_letter_num == 2){
+                  max_letter = 'C';
+               }else if (max_letter_num == 3){
+                  max_letter = 'D';
+               }else if (max_letter_num == 4){
+                  max_letter = 'E';
+               }else if (max_letter_num == 5){
+                  max_letter = 'F';
+               }
+
+               first_booking.setInt(6, max_row);
+               first_booking.setString(7, max_letter+" ");
+               first_booking.setString(7, String.valueOf(max_letter));
+               first_booking.executeUpdate();
+               
+               return true;
+
+            }
+            
+            return false;
+            
+         } 
+      }
+	} catch(SQLException se){
+		System.err.println("SQL Exception." + "<Message>: " + se.getMessage());
+		return false;
+   }
+   // if we somehow get here
+   return false;
    }
 
    /**
