@@ -304,7 +304,164 @@ public class Assignment2 {
     */
    public int upgrade(int flightID) {
       // Implement this method!
-      return -1;
+      // from handout, should be business, first class, econ for upgrades
+      // still only have 6 seats per row (hence the mod 6/ usage of chars)
+      try{
+
+         PreparedStatement business_statement = connection.prepareStatement(
+            "SELECT flight_id, count(id), max(row) as max_row  " +
+            "FROM booking " +
+            "WHERE flight_id = ? and seat_class = 'business' " +
+            "Group By (flight_id)");
+         business_statement.setInt(1, flightID);
+         ResultSet business_booking = business_statement.executeQuery();
+
+         PreparedStatement first_statement = connection.prepareStatement(
+            "SELECT flight_id, count(id), max(row) as max_row " +
+            "FROM booking " +
+            "WHERE flight_id = ? and seat_class = 'first' " +
+            "Group By (flight_id)");
+         first_statement.setInt(1, flightID);
+         ResultSet firstclass_booking = first_statement.executeQuery();
+
+         PreparedStatement economy_statement = connection.prepareStatement(
+            "SELECT flight_id, count(id), max(row) as max_row  " +
+            "FROM booking " +
+            "WHERE flight_id = ? and seat_class = 'economy' " +
+            "Group By (flight_id)");
+         economy_statement.setInt(1, flightID);
+         ResultSet economy_booking = economy_statement.executeQuery();
+
+         PreparedStatement capacity_statement = connection.prepareStatement(
+            "SELECT flight.id, plane.capacity_business as business_capacity, " +
+            "plane.capacity_economy as economy_capacity, " + 
+            "plane.capacity_first as firstclass_capacity " +
+            "FROM flight, plane " +
+            "WHERE flight.plane = plane.tail_number " +
+            "and flight.id = ?");
+         capacity_statement.setInt(1, flightID);
+         ResultSet flight_capacity = capacity_statement.executeQuery();
+         
+         while(business_booking.next() && firstclass_booking.next() &&  economy_booking.next() && flight_capacity.next()){
+            
+            int max_business_upgrades = -business_booking.getInt("count")+flight_capacity.getInt("business_capacity");
+            println(max_business_upgrades);
+            int max_firstclass_upgrades = -firstclass_booking.getInt("count")+flight_capacity.getInt("firstclass_capacity");
+            println(max_firstclass_upgrades);
+
+            int business_upgrades = 0;
+            int firstclass_upgrades = 0;
+            int total_upgrades = 0;
+
+            if(flight_capacity.getInt("economy_capacity") >= economy_booking.getInt("count")){
+               // aka theres still space? Cant book?
+               // no upgrades but no errors yeEET
+               return 0;		
+            } else {
+               
+               PreparedStatement overbooked_flights = connection.prepareStatement(
+                  "SELECT id " +
+                  "FROM booking " +
+                  "WHERE flight_id = ? and seat_class = 'economy' and row is NULL and letter is NULL " +
+                  "Order by datetime");
+               overbooked_flights.setInt(1, flightID);
+               ResultSet null_bookings = overbooked_flights.executeQuery();
+
+               // while it is all overbooked
+               while(null_bookings.next()){
+
+                  if(max_business_upgrades > 0){
+                     PreparedStatement modify = connection.prepareStatement(
+                        "UPDATE booking " +
+                        "SET seat_class = 'business' "+ 
+                        "AND row = ? and letter = ? " +
+                        "WHERE booking.id = null_bookings.id ");
+
+                     int max_row = booked_b.getInt("maxrow");
+                     int max_letter_num = booked_b.getInt("count") % 6;
+                     char max_letter = 'A';
+                     if(max_letter_num == 0){
+                        max_row = max_row + 1;
+                        max_letter = 'A';
+                     }else if (max_letter_num == 1){
+                        max_letter = 'B'; 
+                     }else if (max_letter_num == 2){
+                        max_letter = 'C';
+                     }else if (max_letter_num == 3){
+                        max_letter = 'D';
+                     }else if (max_letter_num == 4){
+                        max_letter = 'E';
+                     }else if (max_letter_num == 5){
+                        max_letter = 'F';
+                     }
+
+                     modify.setInt(1, max_row);
+                     modify.setString(2, max_letter+" ");
+                     modify.setString(2, String.valueOf(max_letter));
+                     
+                     modify.executeUpdate();	
+                     
+                     // aka if we repeat, we no longer have same upgrade capacity
+                     business_upgrades = business_upgrades + 1;
+                     max_business_upgrades = max_business_upgrades - 1;				
+                  
+                  } else if(max_firstclass_upgrades > 0){
+                     PreparedStatement modify = connection.prepareStatement(
+                     "update booking " +
+                     "set seat_class = 'first' and row = ? and letter = ? " +
+                     "WHERE booking.id = null_bookings.id ");
+
+                     int max_row = booked_f.getInt("maxrow");
+               
+                     int max_letter_num = booked_f.getInt("count") % 6;
+
+                     char max_letter = 'A';
+                     if(max_letter_num == 0){
+                        max_row = max_row + 1;
+                        max_letter = 'A';
+                     }else if (max_letter_num == 1){
+                        max_letter = 'B'; 
+                     }else if (max_letter_num == 2){
+                        max_letter = 'C';
+                     }else if (max_letter_num == 3){
+                        max_letter = 'D';
+                     }else if (max_letter_num == 4){
+                        max_letter = 'E';
+                     }else if (max_letter_num == 5){
+                        max_letter = 'F';
+                     }
+
+                     modify.setInt(1, max_row);
+                     modify.setString(2, max_letter+" ");
+                     modify.setString(2, String.valueOf(max_letter));
+                     
+                     modify.executeUpdate();	
+                     // aka if we repeat, we no longer have same upgrade capacity
+                     firstclass_upgrades = firstclass_upgrades + 1;
+                     max_firstclass_upgrades = max_firstclass_upgrades - 1;
+                     
+                  } else {
+                     // the overbooked passenger loses their booking :(((
+                     PreparedStatement delete_booking = connection.prepareStatement(
+                     "Delete from booking WHERE booking.id = ? ");
+                     // i think delete is the right command?
+                     delete_booking.setInt(1, null_bookings.getInt("id"));
+                     delete_booking.executeUpdate();				
+                  }
+               }
+               // total upgrades
+               total_upgrades = firstclass_upgrades + business_upgrades;
+               return total_upgrades;
+            }
+         }
+
+      } catch(SQLException se){
+         se.printStackTrace();
+         // return false; they want -1
+         return -1
+      }
+      //return false;
+      return -1
    }
 
 
