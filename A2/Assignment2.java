@@ -333,6 +333,19 @@ public class Assignment2 {
    public static void main(String[] args) {
       // You can put testing code in here. It will not affect our autotester.
       System.out.println("Running the code!");
+      try{
+      Assignment2 a2 = new Assignment2();
+      boolean con = a2.connectDB("jdbc:postgresql://localhost:5432/csc343h-abdall77", "abdall77", "");
+      boolean b= a2.bookSeat(1,5,"economy");
+      //b= a2.bookSeat(1,10,"business");
+      //b = a2.bookSeat(1,6,"economy"); 
+      //b = a2.bookSeat(1,1,"first");
+      //b = a2.bookSeat(1,4,"business");   
+      //int upgrade_num = a2.upgrade(5);
+      //System.out.println(upgrade_num);
+      }catch(SQLException se){
+         se.printStackTrace();	
+      }
    }
 
 }
