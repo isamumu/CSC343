@@ -47,7 +47,7 @@ public class Assignment2 {
       try {
          String query;
          PreparedStatement ps;
-         connection = DriverManager.getConnection(url,username,password); 
+         connection = DriverManager.getConnection(URL,username,password); 
          query = "SET search_path TO air_travel, public; ";
          ps = connection.prepareStatement(query);
          ps.executeUpdate();
@@ -100,12 +100,12 @@ public class Assignment2 {
          "SELECT flight.id, plane.capacity_economy as econ_capacity, " +
          "plane.capacity_business as business_capacity, "+ 
          "plane.capacity_first as firstclass_capacity " +
-         "FROM flight, plane "+"
-         WHERE flight.plane = plane.tail_number and flight.id = ?");
+         "FROM flight, plane " +
+         "WHERE flight.plane = plane.tail_number and flight.id = ?");
 
       // set int to get the input
       booking_statement.setInt(1, flightID);
-         ResultSet flight_capacity = bookingStatement.executeQuery();
+      ResultSet flight_capacity = booking_statement.executeQuery();
       
       PreparedStatement flight_price = connection.prepareStatement("SELECT * FROM price WHERE flight_id = ?");
          flight_price.setInt(1, flightID);
@@ -136,7 +136,7 @@ public class Assignment2 {
             // check placement of the brackets
             // (flight_capacity.getInt("capacity_economy") - already_booked.getInt("count")) > -10)
             // equivalent to: 
-            if({
+            if(already_booked.getInt("count") - flight_capacity.getInt("econ_capacity") < 10){
 
                PreparedStatement econ_booking = connection.prepareStatement(
                   "INSERT INTO booking " +
@@ -151,7 +151,7 @@ public class Assignment2 {
                // case where we do not need overbooking
                if(flight_capacity.getInt("econ_capacity") - already_booked.getInt("count") > 0){
 
-                  int economy_start = flight_capacity.getInt("capacity_first")/6 + flight_capacity.getInt("capacity_business")/6 + 3;		
+                  int economy_start = flight_capacity.getInt("firstclass_capacity")/6 + flight_capacity.getInt("business_capacity")/6 + 3;		
                   int max_row = economy_start + already_booked.getInt("count")/6;
                   int max_letter_num = already_booked.getInt("count") % 6;
 
@@ -161,13 +161,13 @@ public class Assignment2 {
                   }else if (max_letter_num == 1){
                      max_letter = 'B'; //(char)(max_letter + max_letter_num);
                   }else if (max_letter_num == 2){
-                     max_letter = 'C'//(char)(max_letter + max_letter_num);
+                     max_letter = 'C';//(char)(max_letter + max_letter_num);
                   }else if (max_letter_num == 3){
-                     max_letter = 'D'//(char)(max_letter + max_letter_num);
+                     max_letter = 'D';//(char)(max_letter + max_letter_num);
                   }else if (max_letter_num == 4){
-                     max_letter = 'E'//(char)(max_letter + max_letter_num);
+                     max_letter = 'E';//(char)(max_letter + max_letter_num);
                   }else if (max_letter_num == 5){
-                     max_letter = 'F'//(char)(max_letter + max_letter_num);
+                     max_letter = 'F';//(char)(max_letter + max_letter_num);
                   }
          
                   econ_booking.setString(7, max_letter+" ");
@@ -194,7 +194,7 @@ public class Assignment2 {
 
                PreparedStatement business_booking = connection.prepareStatement(
                   "INSERT INTO booking " +
-                  "VALUES((SELECT MAX(id) FROM booking)+1, "
+                  "VALUES((SELECT MAX(id) FROM booking)+1, " +
                   "?, ?, ?, ?, ?::seat_class, ?, ?)" );
 
                business_booking.setInt(1, passID);
@@ -202,7 +202,7 @@ public class Assignment2 {
                business_booking.setTimestamp(3, getCurrentTimeStamp());
                business_booking.setInt(4, price);
                business_booking.setString(5, seatClass);
-               int business_start = flight_capacity.getInt("capacity_first")/6 + 1 + 1;		
+               int business_start = flight_capacity.getInt("capacity_first")/6 + 2;		
                int max_row = business_start + already_booked.getInt("count")/6;
                
                int max_letter_num = already_booked.getInt("count") % 6;
@@ -239,8 +239,9 @@ public class Assignment2 {
                
                PreparedStatement first_booking = connection.prepareStatement(
                   "INSERT INTO booking " +
-                  "VALUES((SELECT MAX(id) FROM booking)+1, "
-                  + "?, ?, ?, ?, ?::seat_class, ?, ?)" );
+                  "VALUES((SELECT MAX(id) FROM booking)+1, " +
+                  "?, ?, ?, ?, ?::seat_class, ?, ?)" );
+               //remember to keep it in the same order as the og statment
                first_booking.setInt(1, passID);
                first_booking.setInt(2, flightID);
                first_booking.setTimestamp(3, getCurrentTimeStamp());
@@ -281,7 +282,7 @@ public class Assignment2 {
          } 
       }
 	} catch(SQLException se){
-		System.err.println("SQL Exception." + "<Message>: " + se.getMessage());
+		se.printStackTrace();
 		return false;
    }
    // if we somehow get here
@@ -345,9 +346,9 @@ public class Assignment2 {
          while(business_booking.next() && firstclass_booking.next() &&  economy_booking.next() && flight_capacity.next()){
             
             int max_business_upgrades = -business_booking.getInt("count")+flight_capacity.getInt("business_capacity");
-            println(max_business_upgrades);
+            //println(max_business_upgrades);
             int max_firstclass_upgrades = -firstclass_booking.getInt("count")+flight_capacity.getInt("firstclass_capacity");
-            println(max_firstclass_upgrades);
+            //println(max_firstclass_upgrades);
 
             int business_upgrades = 0;
             int firstclass_upgrades = 0;
@@ -377,8 +378,8 @@ public class Assignment2 {
                         "AND row = ? and letter = ? " +
                         "WHERE booking.id = null_bookings.id ");
 
-                     int max_row = booked_b.getInt("maxrow");
-                     int max_letter_num = booked_b.getInt("count") % 6;
+                     int max_row = business_booking.getInt("maxrow");
+                     int max_letter_num = business_booking.getInt("count") % 6;
                      char max_letter = 'A';
                      if(max_letter_num == 0){
                         max_row = max_row + 1;
@@ -411,9 +412,9 @@ public class Assignment2 {
                      "set seat_class = 'first' and row = ? and letter = ? " +
                      "WHERE booking.id = null_bookings.id ");
 
-                     int max_row = booked_f.getInt("maxrow");
+                     int max_row = firstclass_booking.getInt("maxrow");
                
-                     int max_letter_num = booked_f.getInt("count") % 6;
+                     int max_letter_num = firstclass_booking.getInt("count") % 6;
 
                      char max_letter = 'A';
                      if(max_letter_num == 0){
@@ -458,10 +459,10 @@ public class Assignment2 {
       } catch(SQLException se){
          se.printStackTrace();
          // return false; they want -1
-         return -1
+         return -1;
       }
       //return false;
-      return -1
+      return -1;
    }
 
 
@@ -483,7 +484,7 @@ public class Assignment2 {
 
    // Add more helper functions below if desired.
 
-
+   // no extra helper functions atm
   
   /* ----------------------- Main method below  ------------------------- */
 
