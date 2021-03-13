@@ -36,7 +36,7 @@ FROM flight;
 CREATE VIEW inOut24 AS
 SELECT f1.inbound as airport, (f2.s_dep - f1.s_arv) as timeLeft, f2.outbound as outAirport
 FROM flight f1 join flight f2 on f1.outbound = f2.inbound 
-WHERE (f2.s_dep - f1.s_arv < '24:00:00') and (f2.s_dep - f1.s_arv > '00:00:00') and f2.outbound <> f1.inbound and f2.s_dep >= (SELECT day from day);
+WHERE (f2.s_dep - f1.s_arv < '24:00:00') and (f2.s_dep - f1.s_arv > '00:00:00') and f2.outbound = f1.inbound and f2.s_dep >= (SELECT day from day);
 
 -- find all available flights from Toronto Pearson Airport
 -- ASSUMPTION: any day on or after the day of interest is valid, because one can simply wait for the flight to leave eventually
