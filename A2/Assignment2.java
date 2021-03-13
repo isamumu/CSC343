@@ -416,20 +416,24 @@ public class Assignment2 {
                   "SELECT id " +
                   "FROM booking " +
                   "WHERE flight_id = ? and seat_class = 'economy' and row is NULL and letter is NULL " +
-                  "Order by datetime");
+                  "ORDER BY datetime");
                overbooked_flights.setInt(1, flightID);
                ResultSet null_bookings = overbooked_flights.executeQuery();
-
+               System.out.println("Helloooo");
                // while it is all overbooked
                while(null_bookings.next()){
 
                   if(max_business_upgrades > 0){
                      PreparedStatement modify = connection.prepareStatement(
                         "UPDATE booking " +
-                        "SET seat_class = 'business' "+ 
-                        "AND row = ? and letter = ? " +
+                        "SET seat_class = 'business' AND row = ? and letter = ? " +
                         "WHERE booking.id = null_bookings.id ");
 
+<<<<<<< HEAD
+=======
+                     System.out.println("Hellooooooooooooooooo");
+
+>>>>>>> 740ccde027705b7f9c690c7348df175998d62892
                      int max_row = business_booking.getInt("max_row");
                      int max_letter_num = business_booking.getInt("count") % 6;
                      char max_letter = 'A';
@@ -447,12 +451,15 @@ public class Assignment2 {
                      }else if (max_letter_num == 5){
                         max_letter = 'F';
                      }
+                     System.out.println("Chars are fine");
 
                      modify.setInt(1, max_row);
                      modify.setString(2, max_letter+" ");
                      modify.setString(2, String.valueOf(max_letter));
-                     
+
+                     System.out.println("before the update");
                      modify.executeUpdate();	
+                     System.out.println("after the update");
                      
                      // aka if we repeat, we no longer have same upgrade capacity
                      business_upgrades = business_upgrades + 1;
@@ -460,8 +467,8 @@ public class Assignment2 {
                   
                   } else if(max_firstclass_upgrades > 0){
                      PreparedStatement modify = connection.prepareStatement(
-                     "update booking " +
-                     "set seat_class = 'first' and row = ? and letter = ? " +
+                     "UPDATE booking " +
+                     "SET seat_class = 'first' and row = ? and letter = ? " +
                      "WHERE booking.id = null_bookings.id ");
 
                      int max_row = firstclass_booking.getInt("max_row");
@@ -545,6 +552,7 @@ public class Assignment2 {
       System.out.println("Running the code!");
       try{
       Assignment2 a2 = new Assignment2();
+<<<<<<< HEAD
       boolean con = a2.connectDB("jdbc:postgresql://localhost:5432/csc343h-poyisamu", "poyisamu", "");
       System.out.println("successfully connected!");
       
@@ -565,6 +573,23 @@ public class Assignment2 {
       //System.out.println(upgrade_num);
       boolean dis = a2.disconnectDB();
       System.out.println("successfully disconnected DB!!");
+=======
+      boolean con = a2.connectDB("jdbc:postgresql://localhost:5432/csc343h-abdall77", "abdall77", "");
+      boolean b= a2.bookSeat(1,1,"economy");
+      boolean c = a2.bookSeat(1,4,"first");
+      if (b){
+         System.out.println("booked passenger 1 on flight 1 in class econ");
+      }
+      if (c){
+         System.out.println("booked passenger 1 on flight 4 in class first");
+      }
+      //b= a2.bookSeat(1,10,"business");
+      //b = a2.bookSeat(1,6,"economy"); 
+      //b = a2.bookSeat(1,1,"first");
+      //b = a2.bookSeat(1,4,"business");   
+      int upgrade_num = a2.upgrade(5);
+      System.out.println(upgrade_num);
+>>>>>>> 740ccde027705b7f9c690c7348df175998d62892
       }catch(SQLException se){
          se.printStackTrace();	
       }
