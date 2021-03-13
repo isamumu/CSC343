@@ -63,18 +63,3 @@ WITH RECURSIVE hopping AS (
 SELECT destination, num_flights
 FROM hopping
 ORDER BY num_flights;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

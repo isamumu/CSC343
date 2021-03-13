@@ -181,6 +181,23 @@ public class Assignment2 {
                }
                
                econ_booking.executeUpdate();
+
+               PreparedStatement booking = connection.prepareStatement("SELECT id, pass_id, flight_id, seat_class, row, letter FROM booking");
+
+
+               ResultSet rs = booking.executeQuery();
+               while (rs.next()) {
+                  int id = rs.getInt("id");
+                  int pass_id = rs.getInt("pass_id");
+                  int flight_id = rs.getInt("flight_id");
+                  String seat_class = rs.getString("seat_class");
+                  int row = rs.getInt("row");
+                  String letter = rs.getString("letter");
+
+                  System.out.println("id -> " + id + " pass_id -> " + pass_id + " flight_id -> " + flight_id + " seat_class -> " + seat_class + " row -> " + row + " letter -> " + letter);
+                  
+               }
+               System.out.println("================================================================================================================");
                
                return true;
 
@@ -202,7 +219,7 @@ public class Assignment2 {
                business_booking.setTimestamp(3, getCurrentTimeStamp());
                business_booking.setInt(4, price);
                business_booking.setString(5, seatClass);
-               int business_start = flight_capacity.getInt("capacity_first")/6 + 2;		
+               int business_start = flight_capacity.getInt("firstclass_capacity")/6 + 2;		
                int max_row = business_start + already_booked.getInt("count")/6;
                
                int max_letter_num = already_booked.getInt("count") % 6;
@@ -227,6 +244,24 @@ public class Assignment2 {
                business_booking.setString(7, max_letter+" ");
                business_booking.setString(7, String.valueOf(max_letter));
                business_booking.executeUpdate();
+
+               PreparedStatement booking = connection.prepareStatement("SELECT id, pass_id, flight_id, seat_class, row, letter FROM booking");
+
+
+               ResultSet rs = booking.executeQuery();
+               while (rs.next()) {
+                  int id = rs.getInt("id");
+                  int pass_id = rs.getInt("pass_id");
+                  int flight_id = rs.getInt("flight_id");
+                  String seat_class = rs.getString("seat_class");
+                  int row = rs.getInt("row");
+                  String letter = rs.getString("letter");
+
+                  System.out.println("id -> " + id + " pass_id -> " + pass_id + " flight_id -> " + flight_id + " seat_class -> " + seat_class + " row -> " + row + " letter -> " + letter);
+                  
+               }
+               System.out.println("================================================================================================================");
+
                return true;
 
             }
@@ -272,7 +307,23 @@ public class Assignment2 {
                first_booking.setString(7, max_letter+" ");
                first_booking.setString(7, String.valueOf(max_letter));
                first_booking.executeUpdate();
-               
+
+               PreparedStatement booking = connection.prepareStatement("SELECT id, pass_id, flight_id, seat_class, row, letter FROM booking");
+
+               ResultSet rs = booking.executeQuery();
+               while (rs.next()) {
+                  int id = rs.getInt("id");
+                  int pass_id = rs.getInt("pass_id");
+                  int flight_id = rs.getInt("flight_id");
+                  String seat_class = rs.getString("seat_class");
+                  int row = rs.getInt("row");
+                  String letter = rs.getString("letter");
+
+                  System.out.println("id -> " + id + " pass_id -> " + pass_id + " flight_id -> " + flight_id + " seat_class -> " + seat_class + " row -> " + row + " letter -> " + letter);
+
+               }
+               System.out.println("================================================================================================================");
+
                return true;
 
             }
@@ -281,6 +332,7 @@ public class Assignment2 {
             
          } 
       }
+
 	} catch(SQLException se){
 		se.printStackTrace();
 		return false;
@@ -378,7 +430,7 @@ public class Assignment2 {
                         "AND row = ? and letter = ? " +
                         "WHERE booking.id = null_bookings.id ");
 
-                     int max_row = business_booking.getInt("maxrow");
+                     int max_row = business_booking.getInt("max_row");
                      int max_letter_num = business_booking.getInt("count") % 6;
                      char max_letter = 'A';
                      if(max_letter_num == 0){
@@ -412,7 +464,7 @@ public class Assignment2 {
                      "set seat_class = 'first' and row = ? and letter = ? " +
                      "WHERE booking.id = null_bookings.id ");
 
-                     int max_row = firstclass_booking.getInt("maxrow");
+                     int max_row = firstclass_booking.getInt("max_row");
                
                      int max_letter_num = firstclass_booking.getInt("count") % 6;
 
@@ -493,14 +545,26 @@ public class Assignment2 {
       System.out.println("Running the code!");
       try{
       Assignment2 a2 = new Assignment2();
-      boolean con = a2.connectDB("jdbc:postgresql://localhost:5432/csc343h-abdall77", "abdall77", "");
-      boolean b= a2.bookSeat(1,5,"economy");
-      //b= a2.bookSeat(1,10,"business");
-      //b = a2.bookSeat(1,6,"economy"); 
-      //b = a2.bookSeat(1,1,"first");
-      //b = a2.bookSeat(1,4,"business");   
-      //int upgrade_num = a2.upgrade(5);
+      boolean con = a2.connectDB("jdbc:postgresql://localhost:5432/csc343h-poyisamu", "poyisamu", "");
+      System.out.println("successfully connected!");
+      
+      // for(int i = 1; i < 7; i++){
+      //    boolean b= a2.bookSeat(i,10,"economy");
+      // }
+      //boolean b= a2.bookSeat(4,7,"business");
+      System.out.println("successfully booked economy seat!");
+      // b = a2.bookSeat(1,10,"business");
+      // System.out.println("successfully booked business seat!");
+      // b = a2.bookSeat(1,6,"economy"); 
+      // System.out.println("successfully booked economy seat!");
+      // b = a2.bookSeat(1,1,"first");
+      // System.out.println("successfully booked first seat!");
+      // b = a2.bookSeat(1,4,"business");  
+      // System.out.println("successfully booked business seat!"); 
+      int upgrade_num = a2.upgrade(5);
       //System.out.println(upgrade_num);
+      boolean dis = a2.disconnectDB();
+      System.out.println("successfully disconnected DB!!");
       }catch(SQLException se){
          se.printStackTrace();	
       }
