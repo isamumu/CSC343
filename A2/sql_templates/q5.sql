@@ -36,26 +36,31 @@ FROM flight;
 CREATE VIEW inOut24 AS
 SELECT f1.inbound as airport, (f2.s_dep - f1.s_arv) as timeLeft, f2.outbound as outAirport
 FROM flight f1 join flight f2 on f1.outbound = f2.inbound 
-WHERE (f2.s_dep - f1.s_arv < '24:00:00') and (f2.s_dep - f1.s_arv > '00:00:00') and f2.outbound = f1.inbound and f2.s_dep >= (SELECT day from day);
+WHERE (f1.s_dep - f1.s_arv < '24:00:00') and (f2.s_dep - f1.s_arv > '00:00:00') and f2.outbound = f1.inbound and f1.id <> f2.id and f1.s_dep >= (SELECT day from day);
 
 -- find all available flights from Toronto Pearson Airport
 -- ASSUMPTION: any day on or after the day of interest is valid, because one can simply wait for the flight to leave eventually
 CREATE VIEW YYZflights AS
 SELECT id, outbound, inbound, s_dep, s_arv
 FROM flights
-WHERE outbound = 'YYZ' and s_dep >= (SELECT day from day);
+WHERE outbound = 'YYZ' 
+		and extract (year from s_dep) = (select extract (year from day) from day)
+		and extract (month from s_dep) = (select extract (month from day) from day)
+		and extract (day from s_dep) = (select extract (day from day) from day);
 
 -- HINT: You can answer the question by writing one recursive query below, without any more views.
 -- Your query that answers the question goes below the "insert into" line:
 INSERT INTO q5
 WITH RECURSIVE hopping AS (
-	(SELECT 1 as num_flights, inbound as destination FROM YYZflights)
+	(SELECT 1 as num_flights, inbound as destination, s_arv as arrivals FROM YYZflights)
 	UNION all
-	(SELECT num_flights + 1, airport as destination FROM inout24 JOIN hopping on hopping.destination = inout24.airport WHERE num_flights < (SELECT n from n) and hopping.destination = inout24.airport)
+	(SELECT num_flights + 1, inbound as destination, s_arv as arrivals
+	FROM hopping JOIN flights on hopping.destination = flights.outbound
+	WHERE num_flights < (SELECT n from n) and s_dep - arrivals < '24:00:00')
 ) 
-SELECT destination, num_flights 
+SELECT destination, num_flights
 FROM hopping
-ORDER BY destination;
+ORDER BY num_flights;
 
 
 
