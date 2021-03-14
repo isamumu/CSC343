@@ -429,11 +429,6 @@ public class Assignment2 {
                         "SET seat_class = 'business' AND row = ? and letter = ? " +
                         "WHERE booking.id = null_bookings.id ");
 
-<<<<<<< HEAD
-=======
-                     System.out.println("Hellooooooooooooooooo");
-
->>>>>>> 740ccde027705b7f9c690c7348df175998d62892
                      int max_row = business_booking.getInt("max_row");
                      int max_letter_num = business_booking.getInt("count") % 6;
                      char max_letter = 'A';
@@ -552,7 +547,6 @@ public class Assignment2 {
       System.out.println("Running the code!");
       try{
       Assignment2 a2 = new Assignment2();
-<<<<<<< HEAD
       boolean con = a2.connectDB("jdbc:postgresql://localhost:5432/csc343h-poyisamu", "poyisamu", "");
       System.out.println("successfully connected!");
       
@@ -573,23 +567,6 @@ public class Assignment2 {
       //System.out.println(upgrade_num);
       boolean dis = a2.disconnectDB();
       System.out.println("successfully disconnected DB!!");
-=======
-      boolean con = a2.connectDB("jdbc:postgresql://localhost:5432/csc343h-abdall77", "abdall77", "");
-      boolean b= a2.bookSeat(1,1,"economy");
-      boolean c = a2.bookSeat(1,4,"first");
-      if (b){
-         System.out.println("booked passenger 1 on flight 1 in class econ");
-      }
-      if (c){
-         System.out.println("booked passenger 1 on flight 4 in class first");
-      }
-      //b= a2.bookSeat(1,10,"business");
-      //b = a2.bookSeat(1,6,"economy"); 
-      //b = a2.bookSeat(1,1,"first");
-      //b = a2.bookSeat(1,4,"business");   
-      int upgrade_num = a2.upgrade(5);
-      System.out.println(upgrade_num);
->>>>>>> 740ccde027705b7f9c690c7348df175998d62892
       }catch(SQLException se){
          se.printStackTrace();	
       }

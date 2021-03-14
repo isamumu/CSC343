@@ -56,9 +56,9 @@ INSERT INTO q5
 WITH RECURSIVE hopping AS (
 	(SELECT 1 as num_flights, inbound as destination, s_arv as arrivals, s_dep as dep FROM YYZflights)
 	UNION all
-	(SELECT num_flights + 1, inbound as destination, hopping.arrivals, s_dep as dep
+	(SELECT num_flights + 1, flights.inbound as destination, hopping.arrivals, s_dep as dep
 	FROM hopping JOIN flights on hopping.destination = flights.outbound
-	WHERE num_flights < (SELECT n from n) and s_dep - arrivals < '24:00:00' and s_dep - arrivals > '00:00:00')
+	WHERE num_flights < (SELECT n from n) and s_dep > arrivals and s_dep - arrivals < '24:00:00')
 ) 
 SELECT destination, num_flights
 FROM hopping

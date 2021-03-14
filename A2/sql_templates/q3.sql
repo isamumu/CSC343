@@ -73,19 +73,42 @@ WHERE f2.departure - f1.arrival >= '00:30:00' and f3.departure - f2.arrival >= '
 
 -- TODO: combine the tables
 CREATE VIEW combined as
-(SELECT outPort, inPort, 1 as direct, 0 as one_con, 0 as two_con, arrival FROM directFlights) UNION
-(SELECT outPort, inPort, 0 as direct, 1 as one_con, 0 as two_con, arrival FROM oneLayover) UNION
+(SELECT outPort, inPort, 1 as direct, 0 as one_con, 0 as two_con, arrival FROM directFlights) UNION 
+(SELECT outPort, inPort, 0 as direct, 1 as one_con, 0 as two_con, arrival FROM oneLayover) UNION 
 (SELECT outPort, inPort, 0 as direct, 0 as one_con, 1 as two_con, arrival FROM twoLayover);
 
+CREATE VIEW nonFlights as 
+(SELECT outport, inport FROM canadaUSA) EXCEPT
+(SELECT outPort, inPort FROM combined GROUP BY outport, inPort);
+
+CREATE VIEW nulls as 
+SELECT outPort, inPort, 0 as direct, 0 as one_con, 0 as two_con, null as arrival 
+FROM nonFlights;
+
+CREATE VIEW resultPairs as
+(SELECT combined.outPort, combined.inPort, direct, one_con, two_con, arrival
+FROM canadaUSA c1 FULL JOIN combined on c1.outport = combined.outPort and c1.inPort = combined.inPort);
+
 CREATE VIEW result as
-SELECT a1.city as outPort, a2.city as inPort, direct, one_con, two_con, arrival
-FROM combined JOIN airport a1 on a1.code = combined.outPort
-              JOIN airport a2 on a2.code = combined.inPort;
+(SELECT outPort, inPort, direct, one_con, two_con
+FROM combined) UNION 
+(SELECT outPort, inPort, direct, one_con, two_con
+FROM nulls); 
 
 
+-- (SELECT a1.city as outPort, a2.city as inPort, direct, one_con, two_con
+-- FROM combined JOIN airport a1 on a1.code = combined.outPort
+--               JOIN airport a2 on a2.code = combined.inPort) 
+
+CREATE VIEW resultArrivals as
+SELECT result.outPort, result.inPort, result.direct, result.one_con, result.two_con, combined.arrival
+FROM result LEFT join combined on result.outport = combined.outport and result.inport = combined.inport
+                                                               and result.direct = combined.direct
+                                                               and result.one_con = combined.one_con
+                                                               and result.two_con = combined.two_con;
 
 -- Your query that answers the question goes below the "insert into" line:
 INSERT INTO q3
 SELECT outport, inPort, sum(direct) as direct, sum(one_con) as one_con, sum(two_con) as two_con, min(arrival)
-FROM result
+FROM resultArrivals
 GROUP BY outport, inPort;

@@ -19,6 +19,8 @@ CREATE TABLE q4 (
 -- the first time this file is imported.
 DROP VIEW IF EXISTS intermediate_step CASCADE;
 DROP VIEW IF EXISTS airlineTail cascade;
+DROP VIEW IF EXISTS departed cascade;
+DROP VIEW IF EXISTS groupings cascade;
 
 -- Define views for your intermediate steps here:
 
