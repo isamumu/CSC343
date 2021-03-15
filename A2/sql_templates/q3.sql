@@ -107,8 +107,14 @@ FROM result LEFT join combined on result.outport = combined.outport and result.i
                                                                and result.one_con = combined.one_con
                                                                and result.two_con = combined.two_con;
 
+CREATE VIEW resultLabels as
+(SELECT a1.city as outPort, a2.city as inPort, direct, one_con, two_con, arrival
+FROM resultArrivals LEFT JOIN airport a1 on a1.code = resultArrivals.outPort
+              LEFT JOIN airport a2 on a2.code = resultArrivals.inPort);
+
 -- Your query that answers the question goes below the "insert into" line:
 INSERT INTO q3
 SELECT outport, inPort, sum(direct) as direct, sum(one_con) as one_con, sum(two_con) as two_con, min(arrival)
-FROM resultArrivals
-GROUP BY outport, inPort;
+FROM resultLabels
+GROUP BY outport, inPort
+ORDER BY outport, inPort;

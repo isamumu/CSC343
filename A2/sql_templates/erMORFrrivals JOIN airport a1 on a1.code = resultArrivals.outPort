@@ -1,0 +1,30 @@
+ outport | inport | direct | one_con | two_con |       arrival       
+---------+--------+--------+---------+---------+---------------------
+ YTZ     | ORD    |      0 |       0 |       0 | 
+ ORD     | YYZ    |      0 |       0 |       0 | 
+ LGA     | YTZ    |      0 |       0 |       0 | 
+ YTZ     | JFK    |      0 |       0 |       0 | 
+ YYZ     | BUF    |      0 |       0 |       0 | 
+ ORD     | YVR    |      0 |       0 |       0 | 
+ YYZ     | JFK    |      0 |       0 |       0 | 
+ LGA     | YYZ    |      0 |       0 |       0 | 
+ YTZ     | BUF    |      0 |       0 |       0 | 
+ ORD     | YTZ    |      0 |       0 |       0 | 
+ YYZ     | LGA    |      1 |       0 |       0 | 2021-04-30 16:15:00
+ BUF     | YTZ    |      0 |       0 |       0 | 
+ YTZ     | LGA    |      0 |       0 |       0 | 
+ YVR     | BUF    |      0 |       0 |       0 | 
+ BUF     | YYZ    |      0 |       0 |       0 | 
+ JFK     | YVR    |      0 |       0 |       0 | 
+ BUF     | YVR    |      0 |       0 |       0 | 
+ LGA     | YVR    |      0 |       0 |       0 | 
+ JFK     | YYZ    |      0 |       0 |       0 | 
+ YVR     | JFK    |      0 |       0 |       0 | 
+ YVR     | LGA    |      1 |       0 |       0 | 2021-04-30 20:15:00
+ YYZ     | LGA    |      0 |       1 |       0 | 2021-04-30 16:15:00
+ YYZ     | LGA    |      0 |       1 |       0 | 2021-04-30 20:15:00
+ JFK     | YTZ    |      0 |       0 |       0 | 
+ YVR     | ORD    |      0 |       0 |       0 | 
+ YYZ     | ORD    |      1 |       0 |       0 | 2021-04-30 10:45:00
+(26 rows)
+
