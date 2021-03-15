@@ -29,10 +29,11 @@ CREATE VIEW airlineTail as
 SELECT airline, tail_number, (capacity_economy + capacity_business + capacity_first) as maxCap
 FROM plane;
 
--- find planes that have actually departed
+-- find planes that have actually departed and have been booked
 CREATE VIEW departed as
 SELECT id, airline, plane
-FROM flight JOIN departure on flight.id = departure.flight_id;
+FROM flight JOIN departure on flight.id = departure.flight_id
+WHERE id IN (SELECT flight_id FROM Booking);
 
 -- find the capacity of flihgts that have actually departed
 CREATE VIEW capDepartedFlights as
@@ -91,8 +92,10 @@ CREATE VIEW combinedFlights as
 (SELECT normalCap.airline, normalCap.tail_number, 0 as very_low, 0 as low, 0 as fair, normal, 0 as high FROM normalCap) UNION
 (SELECT highCap.airline, highCap.tail_number, 0 as very_low, 0 as low, 0 as fair, 0 as normal, high FROM highCap);  
 
+
+-- NOTE: we only consider the flights in which there were bookings. THUS, if the flight never departed, then we do not have a histogram for it
 -- Your query that answers the question goes below the "insert into" line:
 INSERT INTO q4
 SELECT combinedFlights.airline, combinedFlights.tail_number, sum(very_low) as very_low, sum(low) as low, sum(fair) as fair, sum(normal) as normal, sum(high) as high
-FROM combinedFlights
+FROM combinedFlights JOIN airlineTail on combinedFlights.airline = airlineTail.airline and combinedFlights.tail_number = airlineTail.tail_number
 GROUP BY combinedFlights.airline, combinedFlights.tail_number;

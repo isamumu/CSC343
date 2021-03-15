@@ -21,12 +21,12 @@ DROP VIEW IF EXISTS intermediate_step CASCADE;
 -- TODO: check Everyone and Duplicate conditions
 -- find a relation relating a passenger to their flight number
 CREATE VIEW passengers AS 
-SELECT booking.flight_id as flight_id, passenger.id as pass_id
+SELECT distinct booking.flight_id as flight_id, passenger.id as pass_id
 FROM booking JOIN passenger on booking.pass_id = passenger.id;
 
 -- find a relation relating a passenger to their airlines
 CREATE VIEW airPassenger AS
-SELECT passengers.pass_id as pass_id, flight.airline as airline 
+SELECT distinct passengers.pass_id as pass_id, flight.airline as airline 
 FROM passengers JOIN flight on passengers.flight_id = flight.id;
 
 -- find a relation relating a passenger to their firstname and lastname, with their passenger id 
