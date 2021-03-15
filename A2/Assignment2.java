@@ -364,6 +364,19 @@ public class Assignment2 {
    public int upgrade(int flightID) {
       // Implement this method!
 		try {
+
+         // does this damn flight even EXIST
+         String yeet =  "SELECT * FROM flight WHERE id=?";
+         PreparedStatement yeet_statement = connection.prepareStatement(yeet);
+         yeet_statement.setInt(1, flightID);
+         ResultSet yeetexists = yeet_statement.executeQuery();
+
+         if (!yeetexists.next()){
+            System.out.println("flight not found");
+            return -1;	
+         }
+
+         // now we can check the overbooking
 			String overbooked_query = "SELECT pass_id AS overbookedPassengers, id as book_id FROM booking " + 
                               "WHERE flight_id=? AND row IS NULL ORDER BY datetime";
 	 		PreparedStatement overbooked_statement = connection.prepareStatement(overbooked_query);
@@ -392,7 +405,7 @@ public class Assignment2 {
             }else {
                System.out.println("error accessing currently booked business seats");					 
             }
-            //System.out.println(currentBookedBusinessSeats);
+            System.out.println("Currently booked business class seats: "+ currentBookedBusinessSeats);
 
 
             int totalBusinessClassCapacity =0; // = getSeatClassCapacity( flightID, "business")
@@ -408,7 +421,7 @@ public class Assignment2 {
             } else {
                System.out.println("error in business class capacity");					 
             }
-           // System.out.println(totalBusinessClassCapacity);
+            System.out.println("actual business capacity = " + totalBusinessClassCapacity);
 
             int totalfirstCapacity =0; // = getSeatClassCapacity( flightID, "first")
             String first_cap_q = "SELECT capacity_first as firstclass_capacity FROM flight, plane " + 
@@ -423,13 +436,13 @@ public class Assignment2 {
             } else {
                System.out.println("error in first class capacity");					 
             }
-            //System.out.println(totalfirstCapacity);
+            System.out.println("actual first class capacity = " + totalfirstCapacity);
 
             int currentBookedFirstClassSeats = 0; // = currentSeatClassOccupation(flightID, "first") 
             String currently_booked_first_q = "SELECT count(*) AS occupancy_count FROM booking WHERE flight_id=? AND seat_class=?::seat_class";
             PreparedStatement cbfs = connection.prepareStatement(currently_booked_first_q);
             cbfs.setInt(1, flightID);
-            cbfs.setString(2, "business");       
+            cbfs.setString(2, "first");       
             ResultSet currentlyBookedFirstClass = cbfs.executeQuery();
                      
             if (currentlyBookedFirstClass.next()){
@@ -437,7 +450,7 @@ public class Assignment2 {
             } else {
                System.out.println("error accessing currently booked first class seats");					 
             }
-            //System.out.println(currentBookedFirstClassSeats);
+            System.out.println("Currently booked first class seats: " + currentBookedFirstClassSeats);
 
 
             
@@ -452,7 +465,6 @@ public class Assignment2 {
                existance_statement.setInt(1, flightID);
                ResultSet exists = existance_statement.executeQuery();
 
-						 
 			      if (!exists.next()){
 				      System.out.println("BOOKING NOT FOUND");
 				      return -1;	
@@ -556,10 +568,10 @@ public class Assignment2 {
                existance_statement.setInt(2, overbooked_passenger);
                existance_statement.setInt(1, flightID);
                ResultSet exists = existance_statement.executeQuery();
-						 
-			      if (!exists.next()){
-				      System.out.println("BOOKING NOT FOUND");
-				      return -1;	
+
+               if (!exists.next()){
+                  System.out.println("BOOKING NOT FOUND");
+                  return -1;	
 			      }
                // else continue
                System.out.println("update first class");
@@ -739,44 +751,60 @@ public class Assignment2 {
       // //b = a2.bookSeat(1,4,"business");   
       // int upgrade_num = a2.upgrade(10);
       // System.out.println(upgrade_num);
-      a2.bookSeat(1, 5,  "economy");		
-      a2.bookSeat(2, 5,  "economy");
-      a2.bookSeat(3, 5,  "economy");
-      a2.bookSeat(4, 5,  "economy");
-      a2.bookSeat(1, 10, "economy");
-      a2.bookSeat(1, 10, "economy");
-      a2.bookSeat(1, 10, "economy");
-      a2.bookSeat(1, 10, "economy");
-      a2.bookSeat(1, 10, "economy");
-      a2.bookSeat(1, 10, "economy");
-      a2.bookSeat(1, 10, "economy");
-      a2.bookSeat(1, 10, "economy");
-      a2.bookSeat(1, 10, "economy");
-      a2.bookSeat(1, 10, "economy");
-      a2.bookSeat(1, 10, "economy");
-      a2.bookSeat(1, 10, "economy");
-      a2.bookSeat(1, 10, "economy");
-      a2.bookSeat(1, 10, "economy");
-      a2.bookSeat(1, 10, "economy");
-      a2.bookSeat(2, 3, "economy");
 
-      a2.bookSeat(1, 7,  "economy");
-      a2.bookSeat(1, 7,  "economy");
+      // second set of test
+      // a2.bookSeat(1, 5,  "economy");		
+      // a2.bookSeat(2, 5,  "economy");
+      // a2.bookSeat(3, 5,  "economy");
+      // a2.bookSeat(4, 5,  "economy");
+      // a2.bookSeat(1, 10, "economy");
+      // a2.bookSeat(1, 10, "economy");
+      // a2.bookSeat(1, 10, "economy");
+      // a2.bookSeat(1, 10, "economy");
+      // a2.bookSeat(1, 10, "economy");
+      // a2.bookSeat(1, 10, "economy");
+      // a2.bookSeat(1, 10, "economy");
+      // a2.bookSeat(1, 10, "economy");
+      // a2.bookSeat(1, 10, "economy");
+      // a2.bookSeat(1, 10, "economy");
+      // a2.bookSeat(1, 10, "economy");
+      // a2.bookSeat(1, 10, "economy");
+      // a2.bookSeat(1, 10, "economy");
+      // a2.bookSeat(1, 10, "economy");
+      // a2.bookSeat(1, 10, "economy");
+      // a2.bookSeat(2, 3, "economy");
+
+      // a2.bookSeat(1, 7,  "economy");
+      // a2.bookSeat(1, 7,  "economy");
 
 	   
-      a2.bookSeat(1, 5,  "first");
-      int upgrade_num = a2.upgrade(5);
-      System.out.println(upgrade_num);
-      int upgrade_num2 = a2.upgrade(10);
-      System.out.println(upgrade_num2);
-      int upgrade_num3 = a2.upgrade(7);
-      System.out.println(upgrade_num3);
-      int upgrade_num4 = a2.upgrade(77);
+      // a2.bookSeat(1, 5,  "first");
+      // int upgrade_num = a2.upgrade(5);
+      // System.out.println(upgrade_num);
+      // int upgrade_num2 = a2.upgrade(10);
+      // System.out.println(upgrade_num2);
+      // int upgrade_num3 = a2.upgrade(7);
+      // System.out.println(upgrade_num3);
+      // int upgrade_num4 = a2.upgrade(77);
+      // System.out.println(upgrade_num4);
+
+      // overbooking econ
+      // for (int i = 0; i <130; i++){
+      //    a2.bookSeat(1, 7,  "economy");
+      // }
+      // // completely booking business
+      // for (int i = 0; i <20; i++){
+      //    a2.bookSeat(1, 7,  "business");
+      // }
+      // int upgrade_num = a2.upgrade(7);
+      // System.out.println(upgrade_num);
+
+      //upgrading a flight that doesnt exist
+      int upgrade_num4 = a2.upgrade(66);
       System.out.println(upgrade_num4);
 
       }catch(SQLException se){
          se.printStackTrace();	
       }
    }
-
 }
