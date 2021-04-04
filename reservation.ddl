@@ -4,6 +4,7 @@ drop schema if exists reservation cascade;
 create schema reservation;
 set search_path to reservation;
 
+-- ====================== Constraints ======================
 -- enforced constraints: 
 -- rating and age are numbers between 0 and 5 inclusive
 -- age is a number greater than 0
@@ -11,6 +12,17 @@ set search_path to reservation;
 -- foreign key constraints:
 -- In table Booking there are 2 foreign keys: sID from Skipper, and cID from Craft
 
+-- primary key constraints: 
+-- In tables Skipper and Craft, the primary keys are sID and cID respectively
+
+-- Not null constraints: 
+-- in Skipper -> sName, rating, and age cannot be null
+-- in Craft -> cName, and length cannot be null
+
+-- Additional constraints: 
+-- length in craft must be greater than 0
+
+-- ====================== FDs ======================
 -- Functional Dependencies
 -- {sID -> sName, rating, age; cID -> cName, length) 
 
