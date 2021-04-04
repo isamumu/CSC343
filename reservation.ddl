@@ -8,6 +8,9 @@ set search_path to reservation;
 -- rating and age are numbers between 0 and 5 inclusive
 -- age is a number greater than 0
 
+-- foreign key constraints:
+-- In table Booking there are 2 foreign keys: sID from Skipper, and cID from Craft
+
 -- Functional Dependencies
 -- {sID -> sName, rating, age; cID -> cName, length) 
 
@@ -25,8 +28,9 @@ CREATE TABLE Skipper (
 
 CREATE TABLE Craft (
     cID INT PRIMARY KEY,
-    cName CHAR(30) NOT NULL
-    length INT NOT NULL 
+    cName CHAR(30) NOT NULL,
+    length INT NOT NULL,
+    check (length > 0)
 ); 
 
 CREATE TABLE Booking (
